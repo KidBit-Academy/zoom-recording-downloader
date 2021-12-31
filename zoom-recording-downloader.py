@@ -37,8 +37,8 @@ API_ENDPOINT_USER_LIST = 'https://api.zoom.us/v2/users'
 
 # Start date now split into YEAR, MONTH, and DAY variables (Within 6 month range)
 RECORDING_START_YEAR = 2021
-RECORDING_START_MONTH = 1
-RECORDING_START_DAY = 1
+RECORDING_START_MONTH = 12
+RECORDING_START_DAY = 29
 RECORDING_END_DATE = date.today()
 # RECORDING_END_DATE = date(2021, 8, 1)
 DOWNLOAD_DIRECTORY = 'downloads'
@@ -152,8 +152,8 @@ def list_recordings(email):
     return recordings
 
 
-def download_recording(download_url, email, filename):
-    dl_dir = os.sep.join([DOWNLOAD_DIRECTORY, email])
+def download_recording(download_url, first_name,last_name,email, filename):
+    dl_dir = os.sep.join([DOWNLOAD_DIRECTORY, first_name+"-"+last_name+"-"+email])
     full_filename = os.sep.join([dl_dir, filename])
     os.makedirs(dl_dir, exist_ok=True)
     response = requests.get(download_url, stream=True)
@@ -257,7 +257,7 @@ def main():
                     truncated_url = download_url[0:64] + "..."
                     print("==> Downloading ({} of {}) as {}: {}: {}".format(
                         index+1, total_count, recording_type, recording_id, truncated_url))
-                    success |= download_recording(download_url, email, filename)
+                    success |= download_recording(download_url,first_name,last_name,email, filename)
                     #success = True
                 else:
                     print("### Incomplete Recording ({} of {}) for {}".format(index+1, total_count, recording_id))
@@ -276,9 +276,10 @@ def main():
     print(color.BLUE + "\nRecordings have been saved to: " +
           color.UNDERLINE + "{}".format(save_location) + color.END + "\n")
 
-
-if __name__ == "__main__":
+def zoomHandler():
     # tell Python to run the handler() function when SIGINT is recieved
     signal(SIGINT, handler)
-
     main()
+
+if __name__ == "__main__":
+    zoomHandler()
