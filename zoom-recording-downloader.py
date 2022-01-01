@@ -36,9 +36,10 @@ AUTHORIZATION_HEADER = {'Authorization': ACCESS_TOKEN}
 API_ENDPOINT_USER_LIST = 'https://api.zoom.us/v2/users'
 
 # Start date now split into YEAR, MONTH, and DAY variables (Within 6 month range)
-RECORDING_START_YEAR = 2021
-RECORDING_START_MONTH = 12
-RECORDING_START_DAY = 29
+print("To fetch Recordings from Zoom\n")
+RECORDING_START_YEAR = int(input("Enter the Year:\n"))
+RECORDING_START_MONTH = int(input("Enter the Month:\n"))
+RECORDING_START_DAY = int(input("Enter the Day:\n"))
 RECORDING_END_DATE = date.today()
 # RECORDING_END_DATE = date(2021, 8, 1)
 DOWNLOAD_DIRECTORY = 'downloads'
