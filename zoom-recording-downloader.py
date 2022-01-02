@@ -14,7 +14,9 @@
 # Import TQDM progress bar library
 from tqdm import tqdm
 # Import app environment variables
-from appenv import JWT_TOKEN
+from dotenv import load_dotenv
+load_dotenv()
+# from appenv import JWT_TOKEN
 from sys import exit
 from signal import signal, SIGINT
 from dateutil.parser import parse
@@ -27,7 +29,10 @@ import requests
 import time
 import sys
 import os
+import argparse
 APP_VERSION = "2.1"
+
+JWT_TOKEN=os.environ.get("JWT_TOKEN_ZOOM")
 
 # JWT_TOKEN now lives in appenv.py
 ACCESS_TOKEN = 'Bearer ' + JWT_TOKEN
@@ -35,14 +40,19 @@ AUTHORIZATION_HEADER = {'Authorization': ACCESS_TOKEN}
 
 API_ENDPOINT_USER_LIST = 'https://api.zoom.us/v2/users'
 
+parser = argparse.ArgumentParser()
+parser.add_argument("-d", "--date", help = "dd/mm/yyy")
+parser.add_argument("-p", "--path", help = "Path of Directory")
+args = parser.parse_args()
+Date = args.date.split('/')
+
 # Start date now split into YEAR, MONTH, and DAY variables (Within 6 month range)
-print("To fetch Recordings from Zoom\n")
-RECORDING_START_YEAR = int(input("Enter the Year:\n"))
-RECORDING_START_MONTH = int(input("Enter the Month:\n"))
-RECORDING_START_DAY = int(input("Enter the Day:\n"))
+RECORDING_START_YEAR = int(Date[2])
+RECORDING_START_MONTH = int(Date[1])
+RECORDING_START_DAY = int(Date[0])
 RECORDING_END_DATE = date.today()
 # RECORDING_END_DATE = date(2021, 8, 1)
-DOWNLOAD_DIRECTORY = 'downloads'
+DOWNLOAD_DIRECTORY = args.path
 COMPLETED_MEETING_IDS_LOG = 'completed-downloads.log'
 COMPLETED_MEETING_IDS = set()
 
