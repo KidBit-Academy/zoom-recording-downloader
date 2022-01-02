@@ -41,7 +41,7 @@ AUTHORIZATION_HEADER = {'Authorization': ACCESS_TOKEN}
 API_ENDPOINT_USER_LIST = 'https://api.zoom.us/v2/users'
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-d", "--date", help = "dd/mm/yyy")
+parser.add_argument("-d", "--date", help = "dd/mm/yyyy")
 parser.add_argument("-p", "--path", help = "Path of Directory")
 args = parser.parse_args()
 Date = args.date.split('/')
