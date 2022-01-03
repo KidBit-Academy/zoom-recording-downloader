@@ -14,7 +14,9 @@
 # Import TQDM progress bar library
 from tqdm import tqdm
 # Import app environment variables
-from appenv import JWT_TOKEN
+from dotenv import load_dotenv
+load_dotenv()
+# from appenv import JWT_TOKEN
 from sys import exit
 from signal import signal, SIGINT
 from dateutil.parser import parse
@@ -27,7 +29,10 @@ import requests
 import time
 import sys
 import os
+import argparse
 APP_VERSION = "2.1"
+
+JWT_TOKEN=os.environ.get("JWT_TOKEN_ZOOM")
 
 # JWT_TOKEN now lives in appenv.py
 ACCESS_TOKEN = 'Bearer ' + JWT_TOKEN
@@ -35,13 +40,19 @@ AUTHORIZATION_HEADER = {'Authorization': ACCESS_TOKEN}
 
 API_ENDPOINT_USER_LIST = 'https://api.zoom.us/v2/users'
 
+parser = argparse.ArgumentParser()
+parser.add_argument("-d", "--date", help = "dd/mm/yyyy")
+parser.add_argument("-p", "--path", help = "Path of Directory")
+args = parser.parse_args()
+Date = args.date.split('/')
+
 # Start date now split into YEAR, MONTH, and DAY variables (Within 6 month range)
-RECORDING_START_YEAR = 2021
-RECORDING_START_MONTH = 1
-RECORDING_START_DAY = 1
+RECORDING_START_YEAR = int(Date[2])
+RECORDING_START_MONTH = int(Date[1])
+RECORDING_START_DAY = int(Date[0])
 RECORDING_END_DATE = date.today()
 # RECORDING_END_DATE = date(2021, 8, 1)
-DOWNLOAD_DIRECTORY = 'downloads'
+DOWNLOAD_DIRECTORY = args.path
 COMPLETED_MEETING_IDS_LOG = 'completed-downloads.log'
 COMPLETED_MEETING_IDS = set()
 
@@ -152,8 +163,8 @@ def list_recordings(email):
     return recordings
 
 
-def download_recording(download_url, email, filename):
-    dl_dir = os.sep.join([DOWNLOAD_DIRECTORY, email])
+def download_recording(download_url, first_name,last_name,email, filename):
+    dl_dir = os.sep.join([DOWNLOAD_DIRECTORY, first_name+"-"+last_name+"-"+email])
     full_filename = os.sep.join([dl_dir, filename])
     os.makedirs(dl_dir, exist_ok=True)
     response = requests.get(download_url, stream=True)
@@ -257,7 +268,7 @@ def main():
                     truncated_url = download_url[0:64] + "..."
                     print("==> Downloading ({} of {}) as {}: {}: {}".format(
                         index+1, total_count, recording_type, recording_id, truncated_url))
-                    success |= download_recording(download_url, email, filename)
+                    success |= download_recording(download_url,first_name,last_name,email, filename)
                     #success = True
                 else:
                     print("### Incomplete Recording ({} of {}) for {}".format(index+1, total_count, recording_id))
@@ -276,9 +287,10 @@ def main():
     print(color.BLUE + "\nRecordings have been saved to: " +
           color.UNDERLINE + "{}".format(save_location) + color.END + "\n")
 
-
-if __name__ == "__main__":
+def zoomHandler():
     # tell Python to run the handler() function when SIGINT is recieved
     signal(SIGINT, handler)
-
     main()
+
+if __name__ == "__main__":
+    zoomHandler()
